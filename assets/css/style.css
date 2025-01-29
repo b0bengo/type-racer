@@ -1,0 +1,32 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya&family=Nunito&display=swap');
+
+/* Your existing styles */
+:root{
+    --primary-font: "Alegreya", serif;
+    --secondary-font: "Nunito", sans-serif;
+    /* Orange Shade #ff8400 = hsl(31, 100%, 50%)*/
+    --primary-color: hsl(31, 100%, 50%);
+    --secondary-color: white;
+    --primary-color-light: hsl(31, 100%, 75%);
+}
+
+header{
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    font-family: var(--primary-font);
+}
+
+.btn-outline-orange{
+    background-color: transparent;
+    color: black;
+    border: 2px solid var(--primary-color);
+    font-family: var(--secondary-font);
+}
+
+#results-area{
+    background-color: transparent;
+    color: black;
+    border: 2px solid var(--primary-color-light);
+    font-family: var(--secondary-font);
+}
