@@ -21,13 +21,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const sampleTextDiv = document.getElementById('sample-text');
     const startButton = document.getElementById('start-btn');
     const stopButton = document.getElementById('stop-btn');
+    const retryButton = document.getElementById('retry-btn');
+    const instructionsButton = document.getElementById('instructions-btn');
     const timeDisplay = document.getElementById('time');
     const userInput = document.getElementById('user-input');
     const levelDisplay = document.getElementById('level');
     const wpmDisplay = document.getElementById('wpm');
+    const highlightedTextDiv = document.createElement('div');
+    highlightedTextDiv.id = 'highlighted-text';
+    userInput.parentNode.insertBefore(highlightedTextDiv, userInput.nextSibling);
 
     let startTime;
     let endTime;
+    let testStarted = false;
 
     function getRandomText(textArray) {
         const randomIndex = Math.floor(Math.random() * textArray.length);
@@ -50,12 +56,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function startTest() {
-        startTime = new Date();
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        userInput.disabled = false;
-        userInput.value = ''; // Clear the input area
-        userInput.focus();
+        if (!testStarted) {
+            startTime = new Date();
+            testStarted = true;
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            userInput.disabled = false;
+            userInput.value = ''; // Clear the input area
+            highlightedTextDiv.innerHTML = ''; // Clear the highlighted text area
+            userInput.focus();
+        }
     }
 
     function stopTest() {
@@ -68,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
         startButton.disabled = false;
         stopButton.disabled = true;
         userInput.disabled = true;
+        testStarted = false;
     }
 
     function calculateWPM(timeTaken) {
@@ -93,9 +104,55 @@ document.addEventListener('DOMContentLoaded', function () {
         levelDisplay.textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
     }
 
+    function highlightText() {
+        const sampleText = sampleTextDiv.textContent.trim();
+        const userText = userInput.value.trim();
+        const sampleWords = sampleText.split(" ");
+        const userWords = userText.split(" ");
+    
+        let highlightedText = '';
+        for (let i = 0; i < userWords.length; i++) {
+            if (userWords[i] === sampleWords[i]) {
+                highlightedText += `<span style="color: blue;">${userWords[i]}</span> `;
+            } else {
+                highlightedText += `<span style="color: red;">${userWords[i]}</span> `;
+            }
+        }
+    
+        highlightedTextDiv.innerHTML = highlightedText;
+    }
+
+    function retryTest() {
+        userInput.value = '';
+        highlightedTextDiv.innerHTML = '';
+        timeDisplay.textContent = '0';
+        wpmDisplay.textContent = '0';
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        userInput.disabled = false;
+        testStarted = false;
+        updateSampleText();
+    }
+
     difficultySelect.addEventListener('change', updateSampleText);
     startButton.addEventListener('click', startTest);
     stopButton.addEventListener('click', stopTest);
+    retryButton.addEventListener('click', retryTest);
+    instructionsButton.addEventListener('click', function () {
+        const instructionsModal = new bootstrap.Modal(document.getElementById('instructionsModal'));
+        instructionsModal.show();
+    });
+    userInput.addEventListener('input', function () {
+        if (!testStarted) {
+            startTest();
+        }
+        highlightText();
+    });
+    userInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            stopTest();
+        }
+    });
 
     // Initialise with a random text from the default difficulty level
     updateSampleText();
